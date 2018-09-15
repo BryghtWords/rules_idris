@@ -1,0 +1,7 @@
+load("//idris_tools:idris_repos.bzl", "loadIdrisRepositories")
+
+loadIdrisRepositories()
+
+load("//idris_tools:idris_loader.bzl", "loadIdris")
+
+loadIdris()
