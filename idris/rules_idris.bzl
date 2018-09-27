@@ -1,20 +1,29 @@
+# A provider with one field, transitive_deps
+DependingIPZs = provider(fields = ["transitive_ipzs"])
+SelfIPZ = provider(fields = ["ipz"])
 
+def get_transitive_ipzs(deps):
+  ipzs = [dep[SelfIPZ].ipz for dep in deps]
+  return depset(
+    ipzs,
+    transitive = [dep[DependingIPZs].transitive_ipzs for dep in deps])
 
 def _idris_binary_impl(ctx):
-    modules_files = [ d.files.to_list()[0] for d in ctx.attr.deps]
-    modules = [ mf.path for mf in modules_files]
+    ipzs_files = get_transitive_ipzs(ctx.attr.deps)
+    ipzs = [ mf.path for mf in ipzs_files.to_list()]
     args =  [arg
-             for m in modules
+             for m in ipzs
              for arg in ["--ip", m]] + [f.path for f in ctx.files.srcs] + ["-o", ctx.outputs.bin.path]
+    print (str(ipzs))
 
     # Action to call the script.
     ctx.actions.run_shell(
-        inputs = ctx.files.srcs + [ctx.executable._idris, ctx.executable._idris_packager] + modules_files,
+        inputs = ctx.files.srcs + [ctx.executable._idris, ctx.executable._idris_packager] + ipzs_files.to_list(),
         outputs = [ctx.outputs.bin],
         arguments = args,
         progress_message = "progress",
         tools = [ctx.executable._idris, ctx.executable._idris_packager],
-        command = "cd `dirname %s` && pwd && ls -lah && cd - && HOME=`pwd` %s idris %s \"$@\"" % (modules[0], ctx.executable._idris_packager.path, ctx.executable._idris.path),
+        command = "HOME=`pwd` %s idris %s \"$@\"" % (ctx.executable._idris_packager.path, ctx.executable._idris.path),
         #command = "echo '%s'" % ("\n".join(args)),
     )
     return [DefaultInfo(executable = ctx.outputs.bin)]
@@ -63,26 +72,37 @@ def _remove_extension(p):
     return p.path[:-dot_distance_from_end]
 
 def _idris_library_impl(ctx):
+    ipz = ctx.outputs.ipz
+    ipkg = ctx.actions.declare_file("%{name}.ipkg")
     modules = [_remove_extension(f).replace("/", ".") for f in ctx.files.srcs]
+    ipzs_files = get_transitive_ipzs(ctx.attr.deps)
+    ipzs = [ mf.path for mf in ipzs_files.to_list()]
+    args =  [arg
+             for m in ipzs
+             for arg in ["--ip", m]]
 
-    [
+    # Action to call the script.
     ctx.actions.write(
-      output = ctx.outputs.ipkg,
-      content = "package %s\n\nmodules = %s" % (ctx.attr.name, ", ".join(modules))),
+      output = ipkg,
+      content = "package %s\n\nmodules = %s" % (ctx.attr.name, ", ".join(modules)))
     ctx.actions.run_shell(
-        inputs = ctx.files.srcs + [ctx.executable._idris, ctx.executable._idris_packager, ctx.outputs.ipkg],
-        outputs = [ctx.outputs.ipz],
-        arguments = [],
+        inputs = ctx.files.srcs + [ctx.executable._idris, ctx.executable._idris_packager, ipkg] + ipzs_files.to_list(),
+        outputs = [ipz],
+        arguments = args,
         progress_message = "progress",
         tools = [ctx.executable._idris, ctx.executable._idris_packager],
-        command = "cp \"%s\" \"%s.ipkg\" && HOME=`pwd` %s create \"%s\" \"%s.ipkg\" \"%s\"" % (ctx.outputs.ipkg.path, ctx.attr.name, ctx.executable._idris_packager.path, ctx.executable._idris.path, ctx.attr.name, ctx.outputs.ipz.path),
-    ),
+        command = "cp \"%s\" \"%s.ipkg\" && HOME=`pwd` %s create \"%s\" \"%s.ipkg\" \"%s\" \"$@\" " % (ipkg.path, ctx.attr.name, ctx.executable._idris_packager.path, ctx.executable._idris.path, ctx.attr.name, ipz.path),
+        #command = "echo '%s'" % ("\n".join(args)),
+    )
+    return [
+      DependingIPZs(transitive_ipzs=ipzs_files),
+      DefaultInfo(files = ipzs_files),
+      SelfIPZ(ipz = ipz),
     ]
 
 idris_library_rule = rule(
   implementation = _idris_library_impl,
-  outputs = { "ipz": "ipz/%{name}.ipz",
-              "ipkg": "ipkg/%{name}.ipkg"},
+  outputs = { "ipz": "%{name}.ipz" },
   attrs = {
     "srcs": attr.label_list(
         allow_files = True,
