@@ -73,13 +73,18 @@ def _remove_extension(p):
 
 def _idris_library_impl(ctx):
     ipz = ctx.outputs.ipz
-    ipkg = ctx.actions.declare_file("%{name}.ipkg")
-    modules = [_remove_extension(f).replace("/", ".") for f in ctx.files.srcs]
+    ipkg = ctx.actions.declare_file("%s.ipkg" % ctx.attr.name)
+    wl = len(ctx.label.workspace_root)
+    l = 0 if wl == 0 else wl + 1
+    ws = "." if wl == 0 else ctx.label.workspace_root
+    modules = [_remove_extension(f)[l:].replace("/", ".") for f in ctx.files.srcs]
     ipzs_files = get_transitive_ipzs(ctx.attr.deps)
     ipzs = [ mf.path for mf in ipzs_files.to_list()]
     args =  [arg
              for m in ipzs
              for arg in ["--ip", m]]
+    print("LABEL!!!!")
+    print(ctx.label.workspace_root)
 
     # Action to call the script.
     ctx.actions.write(
@@ -91,7 +96,7 @@ def _idris_library_impl(ctx):
         arguments = args,
         progress_message = "progress",
         tools = [ctx.executable._idris, ctx.executable._idris_packager],
-        command = "cp \"%s\" \"%s.ipkg\" && HOME=`pwd` %s create \"%s\" \"%s.ipkg\" \"%s\" \"$@\" " % (ipkg.path, ctx.attr.name, ctx.executable._idris_packager.path, ctx.executable._idris.path, ctx.attr.name, ipz.path),
+        command = "export THE_PATH=`pwd` && cd \"%s\" && cp \"$THE_PATH/%s\" \"%s.ipkg\" && HOME=`pwd` $THE_PATH/%s create \"$THE_PATH/%s\" \"%s.ipkg\" \"$THE_PATH/%s\" \"$@\" " % (ws, ipkg.path, ctx.attr.name, ctx.executable._idris_packager.path, ctx.executable._idris.path, ctx.attr.name, ipz.path),
         #command = "echo '%s'" % ("\n".join(args)),
     )
     return [
