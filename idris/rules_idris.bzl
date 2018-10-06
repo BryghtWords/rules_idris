@@ -80,11 +80,10 @@ def _idris_library_impl(ctx):
     modules = [_remove_extension(f)[l:].replace("/", ".") for f in ctx.files.srcs]
     ipzs_files = get_transitive_ipzs(ctx.attr.deps)
     ipzs = [ mf.path for mf in ipzs_files.to_list()]
-    args =  [arg
+    args = [arg
              for m in ipzs
              for arg in ["--ip", m]]
-    print("LABEL!!!!")
-    print(ctx.label.workspace_root)
+    print("LABEL!!!!\n\n\n%s\n\n" % ctx.label.workspace_root)
 
     # Action to call the script.
     ctx.actions.write(
