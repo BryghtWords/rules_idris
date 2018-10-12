@@ -1,0 +1,17 @@
+local_repository(
+  name = "rules_idris",
+  path = "../../..",
+)
+
+load("@rules_idris//idris:idris_repos.bzl", "loadIdrisRepositories")
+
+loadIdrisRepositories()
+
+load("@rules_idris//idris:idris_loader.bzl", "loadIdris")
+
+loadIdris()
+
+local_repository(
+  name = "the_lib2",
+  path = "../lib2_ws",
+)

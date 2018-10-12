@@ -47,10 +47,13 @@ else
   export SKIP_CLEAN="$DO_NOT_EXPUNGE"
 fi
 
-run_test "binary"           "Example of a single binary module"                                        "//:binary_example"
-run_test "library"          "Example of a binary module depending on a single internal library module" "//bin:binary_example"
-run_test "dependencies"     "Example of two internal dependencies"                                     "//bin:binary_example"
-run_test "single_ed/bin_ws" "Example of a single external dependency"                                  "//bin:binary_example"
-run_test "double_ed/bin_ws" "Example of two external dependencies"                                     "//bin:binary_example"
-run_test "chain_ed/bin_ws"  "Example of chained External Dependencies"                                 "//bin:binary_example"
+run_test "binary"             "Example of a single binary module"                                        "//:binary_example"
+run_test "library"            "Example of a binary module depending on a single internal library module" "//bin:binary_example"
+run_test "dependencies"       "Example of two internal dependencies"                                     "//bin:binary_example"
+run_test "single_ed/bin_ws"   "Example of a single external dependency"                                  "//bin:binary_example"
+run_test "double_ed/bin_ws"   "Example of two external dependencies"                                     "//bin:binary_example"
+run_test "chain_ed/bin_ws"    "Example of chained External Dependencies"                                 "//bin:binary_example"
+run_test "diamond_ed/bin_ws"  "Example of external dependencies in diamond shape"                        "//bin:binary_example"
+run_test "common_ed/bin_ws"   "Example where the binary and a deep library have a common dependency"     "//bin:binary_example"
+run_test "complex_ed/bin_ws"  "Example with a complex graph of external dependencies"                    "//bin:binary_example"
 
