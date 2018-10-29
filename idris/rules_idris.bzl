@@ -14,7 +14,6 @@ def _idris_binary_impl(ctx):
     args =  [arg
              for m in ipzs
              for arg in ["--ip", m]] + [f.path for f in ctx.files.srcs] + ["-o", ctx.outputs.bin.path]
-    print ("\n\n\n----\n%s\n----\n\n\n" % str(args))
 
     # Action to call the script.
     ctx.actions.run_shell(
@@ -24,7 +23,6 @@ def _idris_binary_impl(ctx):
         progress_message = "progress",
         tools = [ctx.executable._idris, ctx.executable._idris_packager],
         command = "HOME=`pwd` %s idris %s \"$@\"" % (ctx.executable._idris_packager.path, ctx.executable._idris.path),
-        #command = "echo '%s'" % ("\n".join(args)),
     )
     return [DefaultInfo(executable = ctx.outputs.bin)]
 
@@ -73,7 +71,6 @@ def _remove_extension(p):
 
 def _idris_library_impl(ctx):
     ipz = ctx.outputs.ipz
-    #ipkg = ctx.outputs.ipkg
     ipkg = ctx.actions.declare_file("%s.ipkg" % ctx.attr.name) 
     wl = len(ctx.label.workspace_root)
     l = 0 if wl == 0 else wl + 1
@@ -85,20 +82,12 @@ def _idris_library_impl(ctx):
              for m in ipzs
              for arg in ["--ip", "$THE_PATH/%s" % m]])
     command = "export THE_PATH=`pwd` && cd \"%s\" && cp \"$THE_PATH/%s\" \"%s.ipkg\" && HOME=`pwd` $THE_PATH/%s create \"$THE_PATH/%s\" \"%s.ipkg\" \"$THE_PATH/%s\" %s " % (ws, ipkg.path, ctx.attr.name, ctx.executable._idris_packager.path, ctx.executable._idris.path, ctx.attr.name, ipz.path, args)
-    command = "echo '>>>>>>>>>>>>> Building %s' && pwd && (%s)" % (ctx.attr.name, command)
     inputs = ctx.files.srcs + [ctx.executable._idris, ctx.executable._idris_packager, ipkg] + ipzs_files.to_list()
-    #print("LABEL for %s!!!!\n\n\n%s\n\n" % (ctx.attr.name, ctx.label.workspace_root))
-    #print("COMMAND for %s!!!!\n\n\n%s\n\n" % (ctx.attr.name, command))
-    #print("ARGS for %s!!!!\n\n\n%s\n\n" % (ctx.attr.name, str(args)))
-    #print("IPZ for %s!!!!\n\n\n%s\n\n" % (ctx.attr.name, ipz))
-    #print("INPUTS for %s!!!!\n\n\n%s\n\n" % (ctx.attr.name, inputs))
-    print("IPZ paths for %s!!!!\n\n\n%s\n\n" % (ctx.attr.name, ipzs))
 
     # Action to call the script.
     ctx.actions.write(
       output = ipkg,
       content = "package %s\n\nmodules = %s" % (ctx.attr.name, ", ".join(modules)))
-    print("HEY!!!!!!!")
     ctx.actions.run_shell(
         inputs = inputs,
         outputs = [ipz],
@@ -106,7 +95,6 @@ def _idris_library_impl(ctx):
         progress_message = ("building library %s" % ctx.attr.name),
         tools = [ctx.executable._idris, ctx.executable._idris_packager],
         command = command,
-        #command = "echo '%s'" % ("\n".join(args)),
     )
     return [
       DependingIPZs(transitive_ipzs=ipzs_files),
@@ -116,7 +104,6 @@ def _idris_library_impl(ctx):
 
 idris_library_rule = rule(
   implementation = _idris_library_impl,
-  #outputs = { "ipz": "%{name}.ipz", "ipkg": "%{name}.ipkg" },
   outputs = { "ipz": "%{name}.ipz" },
   attrs = {
     "srcs": attr.label_list(
