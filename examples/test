@@ -27,7 +27,14 @@ function run_test() {
       else
           bazel clean --expunge --noasync
       fi
-      bazel run $3 || fail "$2"
+      HAVE_TESTS=$(bazel query 'tests(//...)' --color=no 2>&1 >/dev/null | xargs  | grep "INFO: Empty results")
+      if [ -z "$HAVE_TESTS" ]
+      then
+        RUN_TESTS="bazel test //..."
+      else
+        RUN_TESTS=true
+      fi
+      ($RUN_TESTS && bazel run "$3") || fail "$2"
   else
       echo "____________________________________________________________"
       echo

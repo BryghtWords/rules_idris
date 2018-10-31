@@ -140,12 +140,9 @@ def _idris_test_impl(ctx):
              for m in ipzs
              for arg in ["--ip", "%s" % m]])
     args = "%s " % args
-    #command = "export THE_PATH=`pwd` && cd \"%s\" && cp \"$THE_PATH/%s\" \"%s\" && HOME=`pwd` $THE_PATH/%s idris \"$THE_PATH/%s\" --testpkg \"%s.ipkg\" %s " % (ws, ipkg.path, ctx.attr.name, ctx.executable._idris_packager.path, ctx.executable._idris.path, ctx.attr.name, args)
-    #command = "$THE_PATH/%s idris \"$THE_PATH/%s\" --testpkg \"%s.ipkg\" %s " % (ws, ipkg.path, ctx.attr.name, ctx.executable._idris_packager.path, ctx.executable._idris.path, ctx.attr.name, args)
     command = """
       NEW="{name}_test.ipkg"
       cp "{ipkg}" "$NEW"
-      cat "$NEW"
       ls -l lib/test
       HOME=`pwd` \
       "{idrisPackager}" idris "{idris}" --testpkg "$NEW" {args} && \
