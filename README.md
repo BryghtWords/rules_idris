@@ -4,7 +4,7 @@
 Getting Started
 --------------
 
-Two quik options to get you started:
+Two quick options to get you started:
 
   * If you are already familiar with [bazel](https://bazel.build/), you can head to the [add rules_idris to a bazel project](#add-rules_idris-to-a-bazel-project) section
 
