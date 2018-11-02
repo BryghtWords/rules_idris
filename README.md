@@ -6,16 +6,16 @@ Getting Started
 
 Two quik options to get you started:
 
-  *) If you are already familiar with [bazel](https://bazel.build/), you can head to the [add rules_idris to a bazel project](#add-rules_idris-to-a-bazel-project) section
+  * If you are already familiar with [bazel](https://bazel.build/), you can head to the [add rules_idris to a bazel project](#add-rules_idris-to-a-bazel-project) section
 
-  *) Otherwise head to the [create a simple hello world](#create-a-simple-hello-world) tutorial
+  * Otherwise head to the [create a simple hello world](#create-a-simple-hello-world) tutorial
 
 Add rules_idris to a bazel project
 ----------------------------------
 
-If you have [the nix package manager](https://nixos.org/nix/) installed locally, you can [use it](#foo) and bazel is going to get idris for you.
+If you have [the nix package manager](https://nixos.org/nix/) installed locally, you can [use it](#install-idris_rules-using-nix) and bazel is going to get idris for you.
 
-Otherwise, you can [use a local installation of idris](#foo)
+Otherwise, you can [use a local installation of idris](#install-idris_rules-using-a-local-idris-installation)
 
 ### Install idris_rules using nix
 
