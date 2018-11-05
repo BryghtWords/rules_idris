@@ -26,9 +26,11 @@ This approach allows nix to retrieve idris for you. In fact, in the future this 
 Add the following to your `WORKSPACE` file:
 
 ```python
-local_repository(
-  name = "rules_idris",
-  path = "../..",
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+git_repository(
+    name = "rules_idris",
+    remote = "https://github.com/BryghtWords/rules_idris.git",
+    tag = "v0.1"
 )
 
 load("@rules_idris//idris:idris_repos.bzl", "loadIdrisRepositories")
@@ -47,9 +49,11 @@ With this approach, you need a local installation of idris, and to tell bazel wh
 1. Add the following snippet into your `WORKSPACE` file
 
 ```python
-local_repository(
-  name = "rules_idris",
-  path = "../..",
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+git_repository(
+    name = "rules_idris",
+    remote = "https://github.com/BryghtWords/rules_idris.git",
+    tag = "v0.1"
 )
 
 load("@rules_idris//idris:idris_repos.bzl", "loadIdrisPackagerRepositories")
