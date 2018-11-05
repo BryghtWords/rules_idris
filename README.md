@@ -21,7 +21,9 @@ Afterwards you might want to [add an executable](#create-an-idris-module), [a mo
 
 ### Install idris_rules using nix
 
-This approach allows nix to retrieve idris for you. In fact, in the future this will allow to configure which version of idris you want to use.
+**PREREQUISITES:** [Having nix installed locally](https://nixos.org/nix/download.html)
+
+This approach allows nix to retrieve idris for you. In fact, in the future this will allow per project configuration of the idris version to use.
 
 Add the following to your `WORKSPACE` file:
 
@@ -43,6 +45,8 @@ loadIdris()
 ```
 
 ### Install idris_rules using a local idris installation
+
+**PREREQUISITES:** [Having idris installed locally](https://www.idris-lang.org/download/)
 
 With this approach, you need a local installation of idris, and to tell bazel where to find it.
 
@@ -69,13 +73,60 @@ loadIdris("/path/to/idris/installation") # That is, wichever path that contains 
 3. On the text you have just added, replace `/path/to/idris/installation` with the correct path
 
 ### Create an idris executable
-TODO
+
+Add the following into the `BUILD` file for your executable:
+
+```python
+load("@rules_idris//idris:rules_idris.bzl", "idris_binary")
+
+idris_binary (
+    name = "name_of_the_binary",
+)
+```
+
+It will automatically pick up all the `idr` files from the same folder than the `BUILD` file
 
 ### Create an idris module
-TODO
+
+Add the following into the `BUILD` file for your executable:
+
+```python
+load("@rules_idris//idris:rules_idris.bzl", "idris_library")
+
+idris_library (
+    name = "name_of_the_library",
+    visibility = ["//visibility:public"],
+)
+```
+
+It will automatically pick up all the `idr` files from the same folder than the `BUILD` file
 
 ### Test an idris module
-TODO
+
+If we want to test a library, like the one [from the previous section](#create-an-idris-module), we should tweak it's `BUILD` file to look like this:
+
+```python
+load("@rules_idris//idris:rules_idris.bzl", "idris_library", "idris_test")
+
+idris_library (
+    name = "library_example",
+    visibility = ["//visibility:public"],
+)
+
+idris_test (
+    name = "test_example",
+    deps = ["library_example"],
+)
+```
+
+The `idris_test` rule is going to pick up all the `idr` files from the `test` subfolder from where the `BUILD` file is located. Each `idr` in the test should have a test method with this signature:
+
+```idris
+export
+test : IO ()
+```
+
+And the implementation of that method should do nothing if all the tests pass, or exit with a non zero value if the test fails. This will allow for easy integration with external testing libraries.
 
 Tutorials
 ---------
