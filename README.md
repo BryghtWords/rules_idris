@@ -4,6 +4,8 @@
 Getting Started
 --------------
 
+**PREREQUISITES:** [Having bazel installed locally](https://docs.bazel.build/versions/master/install.html)
+
 Two quick options to get you started:
 
   * If you are already familiar with [bazel](https://bazel.build/), you can continue with the [add rules_idris to a bazel project](#add-rules_idris-to-a-bazel-project) section
@@ -132,6 +134,119 @@ Tutorials
 ---------
 
 ### Create a simple hello world
-TODO
 
+Creating a basic project for a simple executable, is a simple three step process:
 
+1. Create the project
+2. Setup idris rules
+3. Add the executable module
+
+#### Concerning Bazel
+
+Bazel projects (also called [workspaces](https://docs.bazel.build/versions/master/build-ref.html#workspace)) are collections of [targets](https://docs.bazel.build/versions/master/build-ref.html#targets). For simplicity, I'm going to say that targets are things that can be built (this is not really true, but will help understand how bazel works).
+
+In turn, this targets are organized into [packages](https://docs.bazel.build/versions/master/build-ref.html#packages). All targets must belong to a package.
+
+You can think of a workspace as a folder that contains a file named `WORKSPACE`. Everything in that folder and subfolders belong to the workspace. Likewise, the `WORKSPACE` file must live in the root folder of your project.
+
+You can think of a package as a folder in the workspace that contains a file named `BUILD`. Everything in that folder and subfolders that are not packages themselves (that is, that don't contain a `BUILD` file) belong to the package.
+
+If you look at this example:
+
+```
+|____my-package
+| |____BUILD
+| |____foo.h
+| |____src
+| | |____bar.cpp
+| |____sub
+| | |____BUILD
+| | |____baz.h
+| | |____src
+| | | |____qux.cpp
+```
+
+`my-package/foo.h` and `my-package/src/bar.cpp` belong to the package `my-package`, where `my-package/sub/baz.h` and `my-package/sub/src/qux.cpp` belong to `sub`
+
+It's also worth noticing that the root folder can be both the workspace and a package. That is, by containing both a `WORKSPACE` file and a `BUILD` file.
+
+The `WORKSPACE` file holds general configuration for the project, things like what external repositories access or tools to use. The `BUILD` files list the targets for that package.
+
+#### 1. Create the project
+
+A bazel project is just a folder with a `WORKSPACE` file. Here we go:
+
+```bash
+mkdir my-project
+cd my-project
+touch WORKSPACE
+```
+
+#### 2. Setup rules_idris
+
+On this step you have to choose:
+
+1. To use the nix package manager (and install it if you don't already have it)
+
+or
+
+2. To use a local installation of idris (and install it if you don't already have it)
+
+After that, you basically need to add content on your `WORKSPACE` file to tell bazel how to get and use rules_idris. It's preatty much a copy-and-paste as explained [in here if you use nix]((#install-idris_rules-using-nix)) or, otherwise as explained [in here if you use a local installation of idris](#install-idris_rules-using-a-local-idris-installation)
+
+#### 3. Add the executable module
+
+This is where we create our first bit of idris. We will do three things:
+
+1. Create the package
+2. Create the idris code
+3. Configure the target
+
+So first, as mentioned before, a package is a folder with a `BUILD` file. Starting from the root folder:
+
+```bash
+mkdir bin # we can name this folder whatever we want
+cd bin
+touch BUILD
+```
+
+Then we need a bit of idris code. Let's put this code in `bin/Binary.idr`:
+
+```idris
+module Main
+
+main : IO ()
+main = putStrLn "Hello, world!"
+```
+
+And finally, we need to tell bazel about it. Let's add this to the `bin/BUILD` file:
+
+```python
+
+load("@rules_idris//idris:rules_idris.bzl", "idris_binary")
+
+idris_binary (
+    name = "binary_example",
+)
+
+```
+
+#### Let's try it
+
+And that's it, we can now build it:
+
+```bash
+bazel build //bin:binary_example
+```
+
+Or run it:
+
+```bash
+bazel run //bin:binary_example
+```
+
+After running either command, you can find your new file at:
+
+```
+bazel-bin/bin/bin/binary_example
+```
