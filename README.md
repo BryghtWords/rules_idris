@@ -170,7 +170,7 @@ If you look at this example:
 
 It's also worth noticing that the root folder can be both the workspace and a package. That is, by containing both a `WORKSPACE` file and a `BUILD` file.
 
-The `WORKSPACE` file holds general configuration for the project, things like what external repositories access or tools to use. The `BUILD` files list the targets for that package.
+The `WORKSPACE` file holds general configuration for the project, things like what external repositories to access or tools to use. The `BUILD` files list the targets for that package.
 
 #### 1. Create the project
 
