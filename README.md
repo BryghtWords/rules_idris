@@ -1,6 +1,21 @@
 [Idris](https://www.idris-lang.org/) rules for [Bazel](https://bazel.build/)
 =====================
 
+  > The 13th episode of *[Ivor the Engine](https://en.wikipedia.org/wiki/Ivor_the_Engine#Episodes)* (in colour) is titled *Unidentified Objects*. Let's hope our codebase don't have any of those.
+  > - Idris the Dragon
+
+Overview
+--------
+
+**Idris rules** adds Idris support for Bazel. Bazel is a powerful and well maintained build tool with [a lot of interesting characteristics](https://bazel.build/#why-bazel). Combining Bazel and Idris rules, we get an idris build tool that:
+
+ * Can build different types of components (Executables, Libraries and tests)
+ * Make components easy to integrate between them
+ * It's easy to configure (for example, there is no need to specify the list of files/modules of your component by hand)
+ * Supports **external dependencies**. External dependencies only need to be Idris+Bazel projects hosted somewhere (like github, bitbucket, gitlab, ...). This means that, to support external dependencies there is no need to create and maintain some kind of central repository infrastructure. And it's easy for library developers to publish their work.
+
+And there are [more features to come](#roadmap)
+
 Getting Started
 --------------
 
@@ -15,9 +30,11 @@ Two quick options to get you started:
 Add rules_idris to a bazel project
 ----------------------------------
 
-If you have [the nix package manager](https://nixos.org/nix/) installed locally, you can [use it](#install-idris_rules-using-nix) and bazel is going to get idris for you.
+To get started with rules_idris, you only need to initialize them on your `WORKSPACE` file and you will be ready to go. For that you have two options:
 
-Otherwise, you can [use a local installation of idris](#install-idris_rules-using-a-local-idris-installation)
+ * If you have [the nix package manager](https://nixos.org/nix/) installed locally, you can [use it](#install-idris_rules-using-nix) and bazel is going to get idris for you.
+
+ * Otherwise, you can [use a local installation of idris](#install-idris_rules-using-a-local-idris-installation)
 
 Afterwards you might want to [add an executable](#create-an-idris-module), [a module](#create-an-idris-module) or [a test](#test-an-idris-module)
 
@@ -250,3 +267,22 @@ After running either command, you can find your new file at:
 ```
 bazel-bin/bin/bin/binary_example
 ```
+
+Known Issues
+------------
+
+- Testing integration needs to be improved:
+  - Each test component is a collection of Idris modules that contain a test function, if any of this test functions fail, the rest of test functions of that component will not get executed.
+  - Right now, the tests get executed in the bazel build fase. Idiomatic bazel requires that to happen in the run fase.
+- Testing of the rules themselves need to be improved. In the examples foldere there is a prety big collection of bazel projects using rules_idris, with a different organisation each. And there is a 'test' script that builds and runs each of them in turn ensuring that everything goes well, but proper unit testing would be in order. And also integrate a CI so that we can have automatic checks that everything works.
+
+Roadmap
+-------
+
+ - [ ] Improve testing integration
+ - [ ] Add support for starting the idris console from bazel
+ - [ ] Add support for the IDE mode on bazel projects
+ - [ ] Support multiple idris versions
+ - [ ] Add javascript and jvm rules
+ - [ ] Migrate the [companion IdrisPackager project](https://github.com/BryghtWords/idris_packager) from Scala to Idris
+
