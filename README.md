@@ -2,7 +2,8 @@
 =====================
 
   > The 13th episode of *[Ivor the Engine](https://en.wikipedia.org/wiki/Ivor_the_Engine#Episodes)* (in colour) is titled *Unidentified Objects*. Let's hope our codebase don't have any of those.
-  > - Idris the Dragon
+  > 
+  > *Idris the Dragon*
 
 Overview
 --------
