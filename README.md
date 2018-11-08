@@ -12,7 +12,7 @@ Overview
 
 **Idris rules** adds Idris support for Bazel. Bazel is a powerful and well maintained build tool with [a lot of interesting characteristics](https://bazel.build/#why-bazel). Combining Bazel and Idris rules, we get an idris build tool that:
 
- * Can build different types of components (Executables, Libraries and tests)
+ * Can build different types of components (executables, libraries and tests)
  * Make components easy to integrate between them
  * It's easy to configure (for example, there is no need to specify the list of files/modules of your component by hand)
  * Supports **external dependencies**. External dependencies only need to be Idris+Bazel projects hosted somewhere (like github, bitbucket, gitlab, ...). This means that, to support external dependencies there is no need to create and maintain some kind of central repository infrastructure. And it's easy for library developers to publish their work.
