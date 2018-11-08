@@ -1,3 +1,5 @@
+![Idris Rules Logo](logo/IdrisRulesLogoText.png "Idris Rules")
+
 [Idris](https://www.idris-lang.org/) rules for [Bazel](https://bazel.build/)
 =====================
 
