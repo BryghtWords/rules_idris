@@ -3,6 +3,8 @@
 [Idris](https://www.idris-lang.org/) rules for [Bazel](https://bazel.build/)
 =====================
 
+[![Build Status](https://travis-ci.org/BryghtWords/rules_idris.svg?branch=master)](https://travis-ci.org/BryghtWords/rules_idris)
+
   > The 13th episode of *[Ivor the Engine](https://en.wikipedia.org/wiki/Ivor_the_Engine#Episodes)* (in colour) is titled *Unidentified Objects*. Let's hope our codebase don't have any of those.
   > 
   > *Idris the Dragon*
