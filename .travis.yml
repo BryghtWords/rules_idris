@@ -9,4 +9,5 @@ addons:
 
 script:
   - curl https://nixos.org/nix/install | sh
+  - . /home/travis/.nix-profile/etc/profile.d/nix.sh
   - cd examples && ./test
