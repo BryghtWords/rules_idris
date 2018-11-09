@@ -8,4 +8,5 @@ addons:
     - bazel
 
 script:
+  - curl https://nixos.org/nix/install | sh
   - cd examples && ./test
