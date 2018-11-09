@@ -288,4 +288,3 @@ Roadmap
  - [ ] Support multiple idris versions
  - [ ] Add javascript and jvm rules
  - [ ] Migrate the [companion IdrisPackager project](https://github.com/BryghtWords/idris_packager) from Scala to Idris
-
