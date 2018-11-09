@@ -279,7 +279,7 @@ Known Issues
 - Testing integration needs to be improved:
   - Each test component is a collection of Idris modules that contain a test function, if any of this test functions fail, the rest of test functions of that component will not get executed.
   - Right now, the tests get executed in the bazel build fase. Idiomatic bazel requires that to happen in the run fase.
-- Testing of the rules themselves need to be improved. In the examples foldere there is a prety big collection of bazel projects using rules_idris, with a different organisation each. And there is a 'test' script that builds and runs each of them in turn ensuring that everything goes well, but proper unit testing would be in order. And also integrate a CI so that we can have automatic checks that everything works.
+- Testing of the rules themselves need to be improved. In the examples foldere there is a prety big collection of bazel projects using rules_idris, with a different organisation each. And there is a 'test' script that builds and runs each of them in turn ensuring that everything goes well, but proper unit testing would be in order.
 
 Roadmap
 -------
