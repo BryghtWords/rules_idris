@@ -21,12 +21,14 @@ function run_test() {
   if [ -d "$DIR/$1" ] 
   then
       cd "$DIR/$1"
-      if $SKIP_CLEAN
-      then
-          echo "Skipping clean"
-      else
-          bazel clean --expunge --noasync
-      fi
+      function do_clean() {
+        if $SKIP_CLEAN
+        then
+            echo "Skipping clean"
+        else
+            bazel clean --expunge --noasync
+        fi
+      }
       HAVE_TESTS=$(bazel query 'tests(//...)' --color=no 2>&1 >/dev/null | xargs  | grep "INFO: Empty results")
       if [ -z "$HAVE_TESTS" ]
       then
@@ -34,7 +36,7 @@ function run_test() {
       else
         RUN_TESTS=true
       fi
-      ($RUN_TESTS && bazel run "$3") || fail "$2"
+      ($RUN_TESTS && bazel run "$3") || (do_clean; fail "$2")
   else
       echo "____________________________________________________________"
       echo
