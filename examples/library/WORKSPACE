@@ -10,3 +10,9 @@ loadIdrisRepositories()
 load("@rules_idris//idris:idris_loader.bzl", "loadIdris")
 
 loadIdris()
+
+git_repository(
+    name = "IdrisTest",
+    remote = "https://github.com/BryghtWords/IdrisTest.git",
+    tag = "v0.1"
+)

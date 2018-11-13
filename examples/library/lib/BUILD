@@ -7,7 +7,7 @@ idris_library (
 
 idris_test (
     name = "test_example",
-    deps = ["library_example"],
+    deps = ["@IdrisTest//idristest:idristest", "library_example"],
 )
 
 
