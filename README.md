@@ -112,7 +112,7 @@ It will automatically pick up all the `idr` files from the same folder than the 
 
 ### Create an idris module
 
-Add the following into the `BUILD` file for your executable:
+Add the following into the `BUILD` file for your module:
 
 ```python
 load("@rules_idris//idris:rules_idris.bzl", "idris_library")
