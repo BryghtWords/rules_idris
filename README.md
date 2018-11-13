@@ -214,7 +214,7 @@ or
 
 2. To use a local installation of idris (and install it if you don't already have it)
 
-After that, you basically need to add content on your `WORKSPACE` file to tell bazel how to get and use rules_idris. It's preatty much a copy-and-paste as explained [in here if you use nix]((#install-idris_rules-using-nix)) or, otherwise as explained [in here if you use a local installation of idris](#install-idris_rules-using-a-local-idris-installation)
+After that, you basically need to add content on your `WORKSPACE` file to tell bazel how to get and use rules_idris. It's preatty much a copy-and-paste as explained [in here if you use nix](#install-idris_rules-using-nix) or, otherwise as explained [in here if you use a local installation of idris](#install-idris_rules-using-a-local-idris-installation)
 
 #### 3. Add the executable module
 
