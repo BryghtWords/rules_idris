@@ -9,18 +9,12 @@ exists p l = isJust (find p l)
 forall : (a -> Bool) -> List a -> Bool
 forall p l = not (exists (\i => not (p i)) l)
 
-finaliseTestRunning : List (Bool, String) -> IO ()
-finaliseTestRunning l = if forall fst l
-                          then putStrLn "All tests PASSED"
-                          else do putStrLn "Some tests FAILED"
-                                  exit 1
+printResults : List (Bool, String) -> IO (List Bool)
+printResults   tests = sequence (map (\pair => do putStrLn (snd pair)
+                                                  pure (fst pair)) tests)
 
-printResults : List (Bool, String) -> IO (List ())
-printResults   tests = sequence (map (\pair => putStrLn (snd pair)) tests)
-
-runTests : List (Bool, String) -> IO ()
-runTests   tests = do printResults tests
-                      finaliseTestRunning tests
+runTests : List (Bool, String) -> IO Bool
+runTests   tests = map (\l => forall id l) (printResults tests)
 
 assert : Bool -> String -> String -> (Bool, String)
 assert   True    s         f      =  (True, s)
@@ -45,5 +39,5 @@ testLibrary2 : (Bool, String)
 testLibrary2 = assertNotEq "Test salute diff" salute "Ups"
 
 export
-test : IO ()
+test : IO Bool
 test = runTests [testDouble, testTriple, testLibrary1, testLibrary2]

@@ -147,10 +147,10 @@ The `idris_test` rule is going to pick up all the `idr` files from the `test` su
 
 ```idris
 export
-test : IO ()
+test : IO Bool -- This should be true if the test or tests in this suite are successful
 ```
 
-And the implementation of that method should do nothing if all the tests pass, or exit with a non zero value if the test fails. This will allow for easy integration with external testing libraries.
+The implementation of this method should return true if all the tests of this suite pass, or false otherwise. This will allow for easy integration with external testing libraries.
 
 Tutorials
 ---------
@@ -276,17 +276,15 @@ bazel-bin/bin/bin/binary_example
 Known Issues
 ------------
 
-- Testing integration needs to be improved:
-  - Each test component is a collection of Idris modules that contain a test function, if any of this test functions fail, the rest of test functions of that component will not get executed.
-  - Right now, the tests get executed in the bazel build fase. Idiomatic bazel requires that to happen in the run fase.
 - Testing of the rules themselves need to be improved. In the examples foldere there is a prety big collection of bazel projects using rules_idris, with a different organisation each. And there is a 'test' script that builds and runs each of them in turn ensuring that everything goes well, but proper unit testing would be in order.
 
 Roadmap
 -------
 
- - [ ] Improve testing integration
+ - [x] Improve testing integration
  - [ ] Add support for starting the idris console from bazel
  - [ ] Add support for the IDE mode on bazel projects
  - [ ] Support multiple idris versions
  - [ ] Add javascript and jvm rules
  - [ ] Migrate the [companion IdrisPackager project](https://github.com/BryghtWords/idris_packager) from Scala to Idris
+ - [ ] Improve reporting of test results
