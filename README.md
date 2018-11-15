@@ -273,6 +273,78 @@ After running either command, you can find your new file at:
 bazel-bin/bin/bin/binary_example
 ```
 
+### Create a simple module
+
+Call it module or library, the distinction is quite difuse in bazel. What we are talking about is a bunch of reusable code that is not, by itself, an executable. For that, all we need is a target that describes how to create this module. And usualy, we put modules on their own packages.
+
+This tutorial follows up from [create a simple hello world](#create-a-simple-hello-world), so from the root folder from the result of that tutorial, we are going to do the following:
+
+1. Create a package and module
+2. Implement some functionality for the module
+3. Make our binary use the module
+
+#### 1. Create a package and module
+
+We only need a new folder and `BUILD` file:
+
+```bash
+mkdir lib
+touch lib/BUILD
+```
+
+And tell the `BUILD` file about our new module. Write this into the `BUILD` file:
+
+```python
+load("@rules_idris//idris:rules_idris.bzl", "idris_library") # This puts the `idris_library` function in scope. It's basically an `import`
+
+# This declares the new library
+idris_library (
+    name = "salutes", # Named `salutes`
+    visibility = ["//visibility:public"], # Accessible from any other bazel target
+)
+```
+
+#### 2. Implement some functionality for the module
+
+Let's start wit a simple bit of idris code. Create the file `lib/Salute.idr`, and add it's functionality:
+
+```idris
+module lib.Salute
+
+export
+salute : String
+salute = "Hello, library example of idris"
+```
+
+#### 3. Make our binary use the module
+
+Two steps, first tell the binary target it can use the new module. Fot that, edit `bin/BUILD` to make it look like this:
+
+```python
+
+load("@rules_idris//idris:rules_idris.bzl", "idris_binary")
+
+idris_binary (
+    name = "binary_example",
+    deps = ["//lib:salutes"], # This is the line that has been added
+)
+```
+
+And finally, let's make un application use the library. Edit `bin/Binary.idr`, to use the new function:
+
+```idris
+
+module Main
+
+import lib.Salute
+
+main : IO ()
+main = putStrLn salute
+
+```
+
+You can try your new code as explained in [here](#lets-try-it).
+
 Known Issues
 ------------
 
