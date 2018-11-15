@@ -9,6 +9,35 @@
   > 
   > *Idris the Dragon*
 
+
+Table of Contents
+-----------------
+
+   * [<a href="https://www.idris-lang.org/" rel="nofollow">Idris</a> rules for <a href="https://bazel.build/" rel="nofollow">Bazel</a>](#idris-rules-for-bazel)
+      * [Overview](#overview)
+      * [Getting Started](#getting-started)
+      * [Add rules_idris to a bazel project](#add-rules_idris-to-a-bazel-project)
+         * [Install idris_rules using nix](#install-idris_rules-using-nix)
+         * [Install idris_rules using a local idris installation](#install-idris_rules-using-a-local-idris-installation)
+         * [Create an idris executable](#create-an-idris-executable)
+         * [Create an idris module](#create-an-idris-module)
+         * [Test an idris module](#test-an-idris-module)
+      * [Tutorials](#tutorials)
+         * [Create a simple hello world](#create-a-simple-hello-world)
+            * [Concerning Bazel](#concerning-bazel)
+            * [1. Create the project](#1-create-the-project)
+            * [2. Setup rules_idris](#2-setup-rules_idris)
+            * [3. Add the executable module](#3-add-the-executable-module)
+            * [Let's try it](#lets-try-it)
+         * [Create a simple module](#create-a-simple-module)
+            * [1. Create a package and module](#1-create-a-package-and-module)
+            * [2. Implement some functionality for the module](#2-implement-some-functionality-for-the-module)
+            * [3. Make our binary use the module](#3-make-our-binary-use-the-module)
+      * [Known Issues](#known-issues)
+      * [Roadmap](#roadmap)
+
+ToC created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
+
 Overview
 --------
 
