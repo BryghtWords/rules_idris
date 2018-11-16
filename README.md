@@ -14,6 +14,7 @@ Table of Contents
 -----------------
 
    * [<a href="https://www.idris-lang.org/" rel="nofollow">Idris</a> rules for <a href="https://bazel.build/" rel="nofollow">Bazel</a>](#idris-rules-for-bazel)
+      * [Table of Contents](#table-of-contents)
       * [Overview](#overview)
       * [Getting Started](#getting-started)
       * [Add rules_idris to a bazel project](#add-rules_idris-to-a-bazel-project)
@@ -33,6 +34,10 @@ Table of Contents
             * [1. Create a package and module](#1-create-a-package-and-module)
             * [2. Implement some functionality for the module](#2-implement-some-functionality-for-the-module)
             * [3. Make our binary use the module](#3-make-our-binary-use-the-module)
+         * [Write a simple idris test](#write-a-simple-idris-test)
+            * [1. Write the test](#1-write-the-test)
+            * [2. Create the test module](#2-create-the-test-module)
+            * [Let's try it](#lets-try-it-1)
       * [Known Issues](#known-issues)
       * [Roadmap](#roadmap)
 
@@ -373,6 +378,84 @@ main = putStrLn salute
 ```
 
 You can try your new code as explained in [here](#lets-try-it).
+
+### Write a simple idris test
+
+From the point of view of bazel, a test is an executable that once run its exit status id either 0 when everything has gone ok or not 0 if something has gone wrong. Bazel doesn't care for anything else.
+
+For this purpose, idris rules provides `idris_test`. A rule that generates the executable's `main` function for you. And expects a single `test` function on each source file on the test module. This `test` functions must have this signature:
+
+```idris
+export
+test : IO Bool -- This should be true if the test or tests in this suite are successful
+```
+
+Given that, only `idris_library` modules can be tested because the test itself must be an executable and merging two executables is dificult.
+
+So, for this tutorial we are going to start from the result of [create a simple module](#create-a-simple-module).
+
+#### 1. Write the test
+
+Tests live on the `test` subfolder of the module you want to test. Since we are testing the `lib:salutes` module, from the root folder execute:
+
+```bash
+mkdir lib/test
+touch lib/test/SaluteTest.idr
+```
+
+And write a simple test on `lib/test/SaluteTest.idr`:
+
+```idris
+module lib.test.LibTest
+
+import lib.Library
+
+export
+test : IO Bool
+test = pure (salute == "Hello, library example of idris")
+```
+
+#### 2. Create the test module
+
+Now, we only need to register the new test module. For that purpose, edit `lib/BUILD` to look like this:
+
+```python
+
+load("@rules_idris//idris:rules_idris.bzl", "idris_library", "idris_test") # CHANGE 1: This now also imports `idris_test`
+
+idris_library (
+    name = "salutes",
+    visibility = ["//visibility:public"],
+)
+
+# CHANGE 2: Add the new test module
+idris_test (
+    name = "test_salutes",
+    deps = ["salutes"], # This tells bazel to link the library we are testing into the executable that is going to run the tests
+)
+
+```
+
+#### Let's try it
+
+And that's it, we can now build our testing module:
+
+```bash
+bazel build //lib:test_salutes
+```
+
+Or run the tests directly:
+
+```bash
+bazel test //lib:test_salutes
+```
+
+NOTE: By default, bazel logs the result of running the tests but doesn't print them on STDOUT. If you want to see the results of running the test (which since there is no `putStrLn` is going to be empty anyway), you should run this:
+
+```bash
+bazel test //lib:test_salutes --test_output=all
+```
+
 
 Known Issues
 ------------
