@@ -460,7 +460,7 @@ bazel test //lib:test_salutes --test_output=all
 Known Issues
 ------------
 
-- Testing of the rules themselves need to be improved. In the examples foldere there is a prety big collection of bazel projects using rules_idris, with a different organisation each. And there is a 'test' script that builds and runs each of them in turn ensuring that everything goes well, but proper unit testing would be in order.
+- Testing of the rules themselves need to be improved. In the examples folder there is a prety big collection of bazel projects using rules_idris, with a different organisation each. And there is a 'test' script that builds and runs each of them in turn ensuring that everything goes well, but proper unit testing would be in order.
 
 Roadmap
 -------
