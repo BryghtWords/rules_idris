@@ -38,6 +38,10 @@ Table of Contents
             * [1. Write the test](#1-write-the-test)
             * [2. Create the test module](#2-create-the-test-module)
             * [Let's try it](#lets-try-it-1)
+         * [Using external libraries](#using-external-libraries)
+            * [1. Declare the extenral dependency](#1-declare-the-extenral-dependency)
+            * [2. Depend on the external library](#2-depend-on-the-external-library)
+            * [3. Use the external library](#3-use-the-external-library)
       * [Known Issues](#known-issues)
       * [Roadmap](#roadmap)
 
@@ -456,6 +460,83 @@ NOTE: By default, bazel logs the result of running the tests but doesn't print t
 bazel test //lib:test_salutes --test_output=all
 ```
 
+### Using external libraries
+
+To make one of your modules use an external library, you need to a) declare it on your WORKSPACE file and b) make the module depend on it.
+
+So, imagine we want to improve our tests from [the previous tutorial](#write-a-simple-idris-test). And for that, we want to make use of [IdirsTest](https://github.com/BryghtWords/IdrisTest), an external library.
+
+We will start this tutorial from the result of the [write a simple idris test](#write-a-simple-idris-test) tutorial.
+
+#### 1. Declare the extenral dependency
+
+First, we need to make our project aware of the external dependency. For that we need to add this to our `WORKSPACE` file:
+
+```python
+
+git_repository(
+    name = "IdrisTest",
+    remote = "https://github.com/BryghtWords/IdrisTest.git",
+    tag = "v0.1"
+)
+
+```
+
+#### 2. Depend on the external library
+
+Second, we need to tell our module (in this case, our test) that it can use the external dependency. Let's modify `lib/BUILD`:
+
+```python
+
+load("@rules_idris//idris:rules_idris.bzl", "idris_library", "idris_test")
+
+idris_library (
+    name = "salutes",
+    visibility = ["//visibility:public"],
+)
+
+idris_test (
+    name = "test_salutes",
+    deps = [
+      "salutes",
+      "@IdrisTest//idristest:idristest", # CHANGE: This tells bazel that `test_salutes` should
+                                         # depend on the `idristest` library from the
+                                         # `idristest` package in the `IdrisTest` repo.
+    ],
+)
+```
+
+#### 3. Use the external library
+
+Finally, we can use the testing library to improve our test. Let's change our `lib/test/SaluteTest.idr`:
+
+```idris
+module lib.test.LibTest
+
+import lib.Library
+import idristest.Suite -- CHANGE 1: Import the tools from the IdrisTest
+
+-- CHANGE 2: Add one unit test
+testLibrary1 : (Bool, String)
+testLibrary1 = assertEq
+                 "Test salute"                      -- Test title
+                 salute                             -- Result
+                 "Hello, library example of idris"  -- Expected
+
+-- CHANGE 3: Add another unit test
+testLibrary2 : (Bool, String)
+testLibrary2 = assertNotEq
+                 "Test salute diff"                 -- Test title
+                 salute                             -- Result
+                 "Ups"                              -- Expected to be different
+
+-- CHANGE 3: The main test function aggregates all the other tests
+export
+test : IO Bool
+test = runTests [testLibrary1, testLibrary2]
+```
+
+Now you can run your test in the same way as explained in [how to run your tests](#lets-try-it-1)
 
 Known Issues
 ------------
