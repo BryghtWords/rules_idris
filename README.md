@@ -541,7 +541,7 @@ Now you can run your test in the same way as explained in [how to run your tests
 Known Issues
 ------------
 
-- Testing of the rules themselves need to be improved. In the examples folder there is a prety big collection of bazel projects using rules_idris, with a different organisation each. And there is a 'test' script that builds and runs each of them in turn ensuring that everything goes well, but proper unit testing would be in order.
+- Testing of the rules themselves needs to be improved. In the examples folder there is a prety big collection of bazel projects using rules_idris, with a different organisation each. And there is a 'test' script that builds and runs each of them in turn ensuring that everything goes well, but proper unit testing would be in order.
 
 Roadmap
 -------
