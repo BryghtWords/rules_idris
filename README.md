@@ -547,7 +547,7 @@ Roadmap
 -------
 
  - [x] Improve testing integration
- - [ ] Add support for starting the idris console from bazel
+ - [x] Add support for starting the idris console from bazel
  - [ ] Add support for the IDE mode on bazel projects
  - [ ] Support multiple idris versions
  - [ ] Add javascript and jvm rules

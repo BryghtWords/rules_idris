@@ -11,7 +11,7 @@ def loadIdrisPackagerRepositories():
   )
   git_repository(
     name = "idris_packager",
-    commit = "53d9170ea8defe05cc3cac20e731ebc0a4d426ee",
+    commit = "284488c94370aa45f69703d0b300c4f2244b279f",
     remote = "https://github.com/BryghtWords/idris_packager.git"
   )
 

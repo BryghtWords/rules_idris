@@ -6,6 +6,63 @@ DependingIPZs = provider(fields = ["transitive_ipzs"])
 SelfIPZ = provider(fields = ["ipz"])
 
 #####################################
+# CONSOLE
+#####################################
+
+def _idris_console_impl(ctx):
+    ipzs_files = get_transitive_ipzs(ctx.attr.deps)
+    ipzs = [ mf.short_path for mf in ipzs_files.to_list()]
+    args =  [arg
+             for m in ipzs
+             for arg in ["--ip", "$DIR/../__main__/%s" % m]] + [f.path for f in ctx.files.srcs]
+
+    runfiles = ctx.runfiles(files = ctx.files.srcs + ctx.files._tools, transitive_files = ipzs_files)
+    for tool in ctx.attr._tools:
+          runfiles = runfiles.merge(tool[DefaultInfo].data_runfiles)
+    script = """
+#!/bin/bash
+
+DIR="${{BASH_SOURCE[0]}}.runfiles/idris"
+
+HOME=`pwd` \
+$DIR/{idrisPackager} idris $DIR/{idris} {args}
+    """.format(
+      idrisPackager = ctx.executable._idris_packager.short_path,
+      idris = ctx.executable._idris.short_path,
+      args = " ".join(args),
+    )
+
+    ctx.actions.write(
+      output = ctx.outputs.bin,
+      content = script)
+    return [DefaultInfo(executable = ctx.outputs.bin, runfiles=runfiles)]
+
+idris_console_rule = rule(
+  implementation = _idris_console_impl,
+  outputs = { "bin": "bin/%{name}", },
+  attrs = {
+    "srcs": attr.label_list(
+        allow_files = True,
+        mandatory = True,),
+    "deps": attr.label_list(),
+    "_idris": attr.label(
+        executable = True,
+        cfg = "host",
+        allow_files = True,
+        default = Label("@idris//:bin/idris"),),
+    "_idris_packager": attr.label(
+        executable = True,
+        cfg = "host",
+        allow_files = True,
+        default = Label("@idris_packager//ip:idrisPackager"),),
+   "_tools": attr.label_list(
+       allow_files = True,
+       default = ["@idris_packager//ip:idrisPackager", "@idris//:bin/idris"],), # Label("@idris_packager//ip:idrisPackager.runfiles"),),
+  },
+  executable = True,
+)
+
+#####################################
 # BINARY
 #####################################
 
@@ -18,7 +75,7 @@ def _idris_binary_impl(ctx):
 
     # Action to call the script.
     ctx.actions.run_shell(
-        inputs = ctx.files.srcs + [ctx.executable._idris, ctx.executable._idris_packager] + ipzs_files.to_list(),
+        inputs = ctx.files.srcs +  ipzs_files.to_list(),
         outputs = [ctx.outputs.bin],
         arguments = args,
         progress_message = "progress",
@@ -52,6 +109,11 @@ idris_binary_rule = rule(
 def idris_binary(name, srcs=None, deps=[]):
   idris_binary_rule(
     name = name,
+    deps = deps,
+    srcs = native.glob(["*.idr"]) if srcs == None else srcs,
+  )
+  idris_console_rule(
+    name = "%s_repl" % name,
     deps = deps,
     srcs = native.glob(["*.idr"]) if srcs == None else srcs,
   )
@@ -122,65 +184,15 @@ def idris_library(name, srcs=None, deps=[], visibility=None):
     srcs = native.glob(["*.idr"]) if srcs == None else srcs,
     visibility = visibility,
   )
+  idris_console_rule(
+    name = "%s_repl" % name,
+    deps = deps,
+    srcs = native.glob(["*.idr"]) if srcs == None else srcs,
+  )
 
 #####################################
 # TEST
 #####################################
-
-#def _idris_test_impl(ctx):
-#    ipkg = ctx.actions.declare_file("%s_test.ipkg" % ctx.attr.name) 
-#    test_result = ctx.actions.declare_file("%s.test_result" % ctx.attr.name) 
-#    wl = len(ctx.label.workspace_root)
-#    l = 0 if wl == 0 else wl + 1
-#    ws = "." if wl == 0 else ctx.label.workspace_root
-#    modules = [_remove_extension(f)[l:].replace("/", ".") for f in ctx.files.srcs]
-#    ipzs_files = get_transitive_ipzs(ctx.attr.deps)
-#    ipzs = [ mf.path for mf in ipzs_files.to_list()]
-#    args = " ".join([arg
-#             for m in ipzs
-#             for arg in ["--ip", "%s" % m]])
-#    args = "%s " % args
-#    command = """
-#      NEW="{name}_test.ipkg"
-#      cp "{ipkg}" "$NEW"
-#      ls -l lib/test
-#      HOME=`pwd` \
-#      "{idrisPackager}" idris "{idris}" --testpkg "$NEW" {args} && \
-#      echo success > "{r}"
-#    """.format(
-#      idris = ctx.executable._idris.path,
-#      idrisPackager = ctx.executable._idris_packager.path,
-#      ipkg = ipkg.path,
-#      ws = ws,
-#      r = test_result.path,
-#      name = ctx.attr.name,
-#      args = args,
-#    )
-#    command2 = """
-#     cat "{r}"
-#    """.format(
-#      r = test_result.short_path,
-#    )
-#    inputs = ctx.files.srcs + [ctx.executable._idris, ctx.executable._idris_packager, ipkg] + ipzs_files.to_list()
-#
-#    # Action to call the script.
-#    ctx.actions.write(
-#      output = ipkg,
-#      content = "package %s\n\nmodules = %s\ntests = %s" % (ctx.attr.name, ", ".join(modules), ", ".join([("%s.test" % m) for m in modules])))
-#    ctx.actions.run_shell(
-#        outputs = [test_result],
-#        inputs = inputs,
-#        arguments = [],
-#        progress_message = ("testing library %s" % ctx.attr.name),
-#        tools = [ctx.executable._idris, ctx.executable._idris_packager],
-#        command = command,
-#    )
-#    ctx.actions.write(
-#      output = ctx.outputs.executable,
-#      content = command2,
-#    )
-#    runfiles = ctx.runfiles(files = [test_result])
-#    return [DefaultInfo(runfiles = runfiles)]
 
 def _idris_test_impl(ctx):
     wl = len(ctx.label.workspace_root)
@@ -262,6 +274,11 @@ def idris_test(name, srcs=None, deps=[], visibility=None):
     deps = deps,
     srcs = native.glob(["test/*.idr"]) if srcs == None else srcs,
     visibility = visibility,
+  )
+  idris_console_rule(
+    name = "%s_repl" % name,
+    deps = deps,
+    srcs = native.glob(["test/*.idr"]) if srcs == None else srcs,
   )
 
 #####################################
