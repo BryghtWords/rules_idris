@@ -22,10 +22,12 @@ def _idris_console_impl(ctx):
     script = """
 #!/bin/bash
 
+cd "$BUILD_WORKING_DIRECTORY"
+
 DIR="${{BASH_SOURCE[0]}}.runfiles/idris"
 
 HOME=`pwd` \
-$DIR/{idrisPackager} idris $DIR/{idris} {args}
+$DIR/{idrisPackager} idris $DIR/{idris} {args} "$@"
     """.format(
       idrisPackager = ctx.executable._idris_packager.short_path,
       idris = ctx.executable._idris.short_path,
@@ -57,7 +59,7 @@ idris_console_rule = rule(
         default = Label("@idris_packager//ip:idrisPackager"),),
    "_tools": attr.label_list(
        allow_files = True,
-       default = ["@idris_packager//ip:idrisPackager", "@idris//:bin/idris"],), # Label("@idris_packager//ip:idrisPackager.runfiles"),),
+       default = ["@idris_packager//ip:idrisPackager", "@idris//:bin/idris"],),
   },
   executable = True,
 )

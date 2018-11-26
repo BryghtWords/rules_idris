@@ -2,7 +2,7 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 def loadIdrisPackagerRepositories():
-  rules_scala_version="b537bddc58a77318b34165812a0311ef52806318"
+  rules_scala_version="4be50865a332aef46c46c94b345c320c3353e9e1"
   http_archive(
     name = "io_bazel_rules_scala",
     url = "https://github.com/bazelbuild/rules_scala/archive/%s.zip"%rules_scala_version,
