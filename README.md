@@ -13,6 +13,7 @@
 Table of Contents
 -----------------
 
+
    * [<a href="https://www.idris-lang.org/" rel="nofollow">Idris</a> rules for <a href="https://bazel.build/" rel="nofollow">Bazel</a>](#idris-rules-for-bazel)
       * [Table of Contents](#table-of-contents)
       * [Overview](#overview)
@@ -30,6 +31,7 @@ Table of Contents
             * [2. Setup rules_idris](#2-setup-rules_idris)
             * [3. Add the executable module](#3-add-the-executable-module)
             * [Let's try it](#lets-try-it)
+         * [Open the idris console (the Repl)](#open-the-idris-console-the-repl)
          * [Create a simple module](#create-a-simple-module)
             * [1. Create a package and module](#1-create-a-package-and-module)
             * [2. Implement some functionality for the module](#2-implement-some-functionality-for-the-module)
@@ -44,6 +46,7 @@ Table of Contents
             * [3. Use the external library](#3-use-the-external-library)
       * [Known Issues](#known-issues)
       * [Roadmap](#roadmap)
+
 
 ToC created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
@@ -94,7 +97,7 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 git_repository(
     name = "rules_idris",
     remote = "https://github.com/BryghtWords/rules_idris.git",
-    tag = "v0.2"
+    tag = "v0.3"
 )
 
 load("@rules_idris//idris:idris_repos.bzl", "loadIdrisRepositories")
@@ -119,7 +122,7 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 git_repository(
     name = "rules_idris",
     remote = "https://github.com/BryghtWords/rules_idris.git",
-    tag = "v0.2"
+    tag = "v0.3"
 )
 
 load("@rules_idris//idris:idris_repos.bzl", "loadIdrisPackagerRepositories")
@@ -310,6 +313,16 @@ After running either command, you can find your new file at:
 ```
 bazel-bin/bin/bin/binary_example
 ```
+
+### Open the idris console (the Repl)
+
+You can open the idris repl with all the dependencies (external or otherwise) in scope. For example, if we want to play with the code from the previous tutorial, just run this:
+
+```
+bazel run //bin:binary_example_repl
+```
+
+To opend the repl for a module, there is an special module created for every idris rule that starts the repl. This module is named exactly like the rule, with "_repl" added at the end.
 
 ### Create a simple module
 
