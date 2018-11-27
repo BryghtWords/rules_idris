@@ -45,6 +45,7 @@ Table of Contents
             * [2. Depend on the external library](#2-depend-on-the-external-library)
             * [3. Use the external library](#3-use-the-external-library)
       * [Known Issues](#known-issues)
+      * [Other Idris build tools / package managers](#other-idris-build-tools--package-managers)
       * [Roadmap](#roadmap)
 
 
@@ -555,6 +556,13 @@ Known Issues
 ------------
 
 - Testing of the rules themselves needs to be improved. In the examples folder there is a prety big collection of bazel projects using rules_idris, with a different organisation each. And there is a 'test' script that builds and runs each of them in turn ensuring that everything goes well, but proper unit testing would be in order.
+
+Other Idris build tools / package managers
+-----------------------------------------
+
+- **[Ikan](https://github.com/idris-industry/ikan)** - A package manager for idris, in idris
+- **[Elba](https://github.com/elba/elba)** - A package manager for Idris
+- **[idream](https://github.com/idream-build/idream)** - A simple build system for Idris
 
 Roadmap
 -------
