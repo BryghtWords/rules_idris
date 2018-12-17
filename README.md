@@ -44,6 +44,11 @@ Table of Contents
             * [1. Declare the extenral dependency](#1-declare-the-extenral-dependency)
             * [2. Depend on the external library](#2-depend-on-the-external-library)
             * [3. Use the external library](#3-use-the-external-library)
+         * [Creating an external libraries](#creating-an-external-libraries)
+            * [1. Setup the project](#1-setup-the-project)
+            * [2. Create the library](#2-create-the-library)
+            * [3. Publish](#3-publish)
+            * [4. Document usage instructions](#4-document-usage-instructions)
       * [Known Issues](#known-issues)
       * [Other Idris build tools / package managers](#other-idris-build-tools--package-managers)
       * [Roadmap](#roadmap)
@@ -54,7 +59,7 @@ ToC created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 Overview
 --------
 
-**Idris rules** adds Idris support for Bazel. Bazel is a powerful and well maintained build tool with [a lot of interesting characteristics](https://bazel.build/#why-bazel). Combining Bazel and Idris rules, we get an idris build tool that:
+**Idris rules** adds Idris support for Bazel. Bazel is a powerful and well maintained build tool with [a lot of interesting characteristics](https://bazel.build/#why-bazel). Combining Bazel and idris rules, we get an idris build tool that:
 
  * Can build different types of components (executables, libraries and tests)
  * Make components easy to integrate between them
@@ -551,6 +556,80 @@ test = runTests [testLibrary1, testLibrary2]
 ```
 
 Now you can run your test in the same way as explained in [how to run your tests](#lets-try-it-1)
+
+### Creating an external libraries
+
+Briefly: an external library is a bazel project whose source code lives on github (or similar). More specificaly a bazel project that can be `git clone`ed.
+
+#### 1. Setup the project
+
+Let's imagine we want to publish our [salutes library](#create-a-simple-module) available for the world to use. We need to create the scaffolding:
+
+```bash
+mkdir salutes
+cd salutes
+touch WORKSPACE
+```
+
+Now we need to install idris rules as explained on [add rules_idris to a bazel project](#add-rules_idris-to-a-bazel-project)
+
+#### 2. Create the library
+
+We are going to place our library in the `lib` folder:
+
+```bash
+mkdir lib
+touch lib/BUILD
+touch lib/Salute.idr
+```
+
+where we are goint to have a `lib/BUILD` like this:
+
+```python
+load("@rules_idris//idris:rules_idris.bzl", "idris_library") # This puts the `idris_library` function in scope. It's basically an `import`
+
+# This declares the new library
+idris_library (
+    name = "salutes", # Named `salutes`
+    visibility = ["//visibility:public"], # Accessible from any other bazel target
+)
+```
+
+and a `lib/Salute.idr` similar to this:
+
+```idris
+module lib.Salute
+
+export
+salute : String
+salute = "Hello, library example of idris"
+```
+
+#### 3. Publish
+
+Now, create a repository on your site of choise (github/bitbucket/...) and push the content of your new library. As simple as that.
+
+#### 4. Document usage instructions
+
+It's usualy a good idea to let your users know how to import your library. For that, a good approach is to write an snippet similar to this in your `README` file:
+
+````markdown
+
+To import `salutes` into your project, you need to add this block into your `WORKSPACE` file:
+
+```python
+
+git_repository(
+    name   = "salutes",
+    remote = "https://github.com/<my_github_username>/<repo_name>.git",
+    tag    = "<tag_of_the_release_to_use>"
+)
+
+```
+
+````
+
+The `remote` field should have whatever URL is needed to clone the project. The `tag` field can be replaced by a `commit` field with the commit id to be used.
 
 Known Issues
 ------------
