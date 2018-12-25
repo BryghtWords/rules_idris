@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+extern "C" 
 void salute() {
-  printf("Hello");
+  printf("\n\n\nHello\n\n\n");
 }

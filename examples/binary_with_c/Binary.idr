@@ -1,5 +1,10 @@
 module Main
 
+%include C "main.h"
+
+salute : IO ()
+salute = foreign FFI_C "salute" (IO ())
+
 main : IO ()
-main = putStrLn "Hello, binary example of idris ;)"
+main = salute
 

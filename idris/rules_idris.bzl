@@ -70,14 +70,37 @@ idris_console_rule = rule(
 
 def _idris_binary_impl(ctx):
     ipzs_files = get_transitive_ipzs(ctx.attr.deps)
+
+    lib_files =  [lib_file
+             for lib in ctx.attr.libs
+             for lib_file in lib.cc.libs ]
+
+    header_files =  [header_file
+             for lib in ctx.attr.libs
+             for header_file in lib.cc.transitive_headers ]
+
+    lib_compile_flags =  [flag
+             for lib in ctx.attr.libs
+             for inner_flag in lib.cc.compile_flags
+             for flag in ["--cg-opt", inner_flag]]
+
+    lib_link_flags =  [flag
+             for lib in ctx.attr.libs
+             for inner_flag in lib.cc.link_flags
+             for flag in ["--cg-opt", inner_flag]]
+
+    libs =  [arg
+             for lib_file in lib_files
+             for arg in ["--cg-opt", "-L%s" % lib_file.dirname, "--cg-opt",  "-l:%s" % lib_file.short_path] ]
+
     ipzs = [ mf.path for mf in ipzs_files.to_list()]
     args =  [arg
              for m in ipzs
-             for arg in ["--ip", m]] + [f.path for f in ctx.files.srcs] + ["-o", ctx.outputs.bin.path]
+             for arg in ["--ip", m]] + [f.path for f in ctx.files.srcs] + ["-o", ctx.outputs.bin.path] + lib_compile_flags + lib_link_flags + libs
 
     # Action to call the script.
     ctx.actions.run_shell(
-        inputs = ctx.files.srcs +  ipzs_files.to_list(),
+        inputs = ctx.files.srcs +  ipzs_files.to_list() + lib_files + header_files,
         outputs = [ctx.outputs.bin],
         arguments = args,
         progress_message = "progress",
@@ -94,6 +117,7 @@ idris_binary_rule = rule(
         allow_files = True,
         mandatory = True,),
     "deps": attr.label_list(),
+    "libs": attr.label_list(),
     "_idris": attr.label(
         executable = True,
         cfg = "host",
@@ -108,10 +132,11 @@ idris_binary_rule = rule(
   executable = True,
 )
 
-def idris_binary(name, srcs=None, deps=[]):
+def idris_binary(name, srcs=None, deps=[], libs=[]):
   idris_binary_rule(
     name = name,
     deps = deps,
+    libs = libs,
     srcs = native.glob(["*.idr"]) if srcs == None else srcs,
   )
   idris_console_rule(
